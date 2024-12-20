@@ -19,6 +19,30 @@ import { auth, signOut } from "../lib/auth";
 import DashboardLinks from "../components/DashboardLinks";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { redirect } from "next/navigation";
+import prisma from "../lib/db";
+import { Toaster } from "@/components/ui/sonner";
+
+async function getData(userId: string) {
+    const data = await prisma.user.findUnique({
+      where: {
+        id: userId
+      },
+      select: {
+        userName: true,
+        grantId: true
+      }
+    })
+
+    if(!data?.userName){
+      return redirect("/onboarding")
+    }
+
+    if(!data?.grantId){
+      return redirect("/onboarding/grant-id")
+    }
+
+    return data
+}
 
 
 export default async function Dashboard({ children }: { children: ReactNode }) {
@@ -27,6 +51,8 @@ export default async function Dashboard({ children }: { children: ReactNode }) {
   if(!session?.user) {
     return redirect('/')
   }
+
+  const data = await getData(session.user?.id as string)
   
   return (
     <>
@@ -113,6 +139,7 @@ export default async function Dashboard({ children }: { children: ReactNode }) {
           </main>
         </div>
       </div>
+      <Toaster richColors closeButton/>
     </>
   );
 }
