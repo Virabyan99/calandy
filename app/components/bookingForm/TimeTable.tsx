@@ -56,6 +56,7 @@ async function getData(userName: string, selectedDate: Date) {
 interface iAppProps {
   selectedDate: Date
   userName: string
+  duration: number
 }
 
 function calculateAvailableTimeSlots(
@@ -110,7 +111,7 @@ function calculateAvailableTimeSlots(
   return freeSlots.map((slot) => format(slot, 'HH:mm'))
 }
 
-export default async function Timetable({ selectedDate, userName }: iAppProps) {
+export default async function Timetable({ selectedDate, userName, duration }: iAppProps) {
   const { data, nylasCalendarData } = await getData(userName, selectedDate)
 
   const formattedDate = format(selectedDate, "yyyy-MM-dd")
@@ -123,7 +124,7 @@ export default async function Timetable({ selectedDate, userName }: iAppProps) {
     formattedDate,
     dbAvailability,
     nylasCalendarData,
-    30
+    duration
   )
 
   return (
@@ -138,7 +139,7 @@ export default async function Timetable({ selectedDate, userName }: iAppProps) {
       <div className='mt-3 max-h-[350px] overflow-y-auto'>
         {availableSlots.length > 0 ? (
             availableSlots.map((slot, index) => (
-                <Link href='/' key={index}>
+                <Link href={`?date=${format(selectedDate, 'yyyy-MM-dd')}&time=${slot}`} key={index}>
                     <Button className='w-full mb-2' variant='outline' >
                         {slot}
                     </Button>
